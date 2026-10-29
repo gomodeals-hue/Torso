@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300f0ff'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TORSO™ // 3D Interactive T-Shirt Customizer Studio</title>
+  <meta name="description"
+    content="Custom design your T-shirt in interactive 3D studio. Drag and drop custom colors, collectible toy stickers, and images across front and back views." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Bebas+Neue&family=Cinzel:wght@600;700;800;900&family=JetBrains+Mono:wght@400;600;700&family=Montserrat:wght@500;700;800;900&family=Orbitron:wght@600;800;900&family=Outfit:wght@300;400;500;600;700;800&family=Pacifico&family=Pirata+One&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Rock+Salt&family=Space+Grotesk:wght@500;700&family=Syne:wght@700;800&family=UnifrakturMaguntia&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+
+<body>
+  <!-- Main Application Shell -->
+  <div id="app" class="app-root">
+
+    <!-- Top Navigation Bar -->
+    <header class="studio-header">
+      <div class="brand-cluster">
+        <div class="brand-logo">
+          <span class="logo-mark">TORSO</span>
+        </div>
+      </div>
+
+      <!-- History & Global Studio Actions -->
+      <div class="header-actions">
+        <div class="history-group">
+          <button id="btn-undo" class="tool-btn" title="Undo (Ctrl+Z)" disabled>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round">
+              <path d="M3 7v6h6" />
+              <path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13" />
+            </svg>
+            <span>Undo</span>
+          </button>
+          <button id="btn-redo" class="tool-btn" title="Redo (Ctrl+Y)" disabled>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round">
+              <path d="M21 7v6h-6" />
+              <path d="M3 17a9 9 0 019-9 9 9 0 016 2.3L21 13" />
+            </svg>
+            <span>Redo</span>
+          </button>
+        </div>
+
+        <div class="divider-v"></div>
+
+        <button id="btn-clear-side" class="tool-btn danger" title="Clear All on Current Side">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 6h18m-2 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+          </svg>
+          <span>Reset Side</span>
+        </button>
+
+        <button id="btn-export-png" class="action-btn primary" title="Export High-Resolution Mockup">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          <span>Export Mockup</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Dual Panel Work Area -->
+    <main class="studio-layout">
+
+      <!-- LEFT PANEL: Customization Toolbox -->
+      <aside class="left-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Customization Lab</h2>
+          <p class="panel-subtitle">Drag & drop colors, toy stickers, and art directly onto the T-shirt</p>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav class="tool-tabs" role="tablist">
+          <button class="tab-btn active" data-tab="style" role="tab">
+            <span class="tab-icon">👔</span>
+            <span class="tab-label">Style & Collar</span>
+          </button>
+          <button class="tab-btn" data-tab="colors" role="tab">
+            <span class="tab-icon">🎨</span>
+            <span class="tab-label">Colors</span>
+          </button>
+          <button class="tab-btn" data-tab="stickers" role="tab">
+            <span class="tab-icon">🧸</span>
+            <span class="tab-label">Toy Stickers</span>
+          </button>
+          <button class="tab-btn" data-tab="images" role="tab">
+            <span class="tab-icon">🖼️</span>
+            <span class="tab-label">Custom Image</span>
+          </button>
+          <button class="tab-btn" data-tab="text" role="tab">
+            <span class="tab-icon">✍️</span>
+            <span class="tab-label">Typography</span>
+          </button>
+          <button class="tab-btn" data-tab="layers" role="tab">
+            <span class="tab-icon">📑</span>
+            <span class="tab-label">Layers (<span id="layer-count">0</span>)</span>
+          </button>
+        </nav>
+
+        <!-- Tab Content Containers -->
+        <div class="tab-content-area">
+
+          <!-- 0. SHIRT STYLE & COLLAR TAB -->
+          <section id="tab-style" class="tab-pane active">
+            <div class="drag-hint-banner">
+              <span class="drag-icon">👔</span>
+              <span>Customize your T-shirt silhouette: choose <strong>with collar</strong> (Polo) or <strong>without
+                  collar</strong> (Crewneck / V-Neck).</span>
+            </div>
+
+            <!-- Quick Collar Toggle Pill -->
+            <div class="collar-quick-card">
+              <span class="section-label">Collar Configuration</span>
+              <div class="collar-toggle-group">
+                <button id="btn-collar-without" class="collar-choice-btn active" data-collar="false">
+                  <span class="choice-icon">👕</span>
+                  <span class="choice-name">Without Collar</span>
+                  <span class="choice-sub">Crewneck / V-Cut</span>
+                </button>
+                <button id="btn-collar-with" class="collar-choice-btn" data-collar="true">
+                  <span class="choice-icon">👔</span>
+                  <span class="choice-name">With Collar</span>
+                  <span class="choice-sub">Polo with Buttons</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Styles Cards List -->
+            <span class="category-heading">Apparel Silhouettes</span>
+            <div class="style-cards-list" id="style-cards-list"></div>
+          </section>
+
+          <!-- 1. COLORS TAB -->
+          <section id="tab-colors" class="tab-pane">
+            <div class="drag-hint-banner">
+              <span class="drag-icon">👆</span>
+              <span><strong>Drag & Drop</strong> any color chip onto the shirt, or click to apply!</span>
+            </div>
+
+            <!-- Custom Color Lab -->
+            <div class="custom-color-card">
+              <div class="custom-color-header">
+                <label for="custom-hex-input" class="section-label">Custom Fabric Color</label>
+                <button id="btn-eyedropper" class="eyedropper-btn" title="Sample color with Pipette">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="m2 22 1-1h3l9-9" />
+                    <path d="M12 8l4 4" />
+                    <path d="m14 6 4-4a2.828 2.828 0 1 1 4 4l-4 4" />
+                  </svg>
+                  <span>Pipette</span>
+                </button>
+              </div>
+
+              <div class="color-picker-input-group">
+                <div class="color-preview-swatch-wrapper">
+                  <input type="color" id="native-color-picker" value="#ffffff" title="Pick custom color" />
+                  <div class="color-preview-circle" id="custom-color-preview" style="background-color: #ffffff;"></div>
+                </div>
+                <input type="text" id="custom-hex-input" class="hex-text-input" value="#FFFFFF" maxlength="7"
+                  placeholder="#FFFFFF" />
+                <button id="btn-apply-hex" class="mini-btn">Apply</button>
+              </div>
+
+              <!-- Fine-tuning HSL Sliders for Custom Color Dial-in -->
+              <div class="hsl-sliders-cluster">
+                <div class="hsl-slider-row">
+                  <span class="hsl-label">Hue</span>
+                  <input type="range" id="slider-hue" min="0" max="360" value="0" class="hue-slider" />
+                  <span id="val-hue" class="hsl-val">0°</span>
+                </div>
+                <div class="hsl-slider-row">
+                  <span class="hsl-label">Saturation</span>
+                  <input type="range" id="slider-sat" min="0" max="100" value="0" class="sat-slider" />
+                  <span id="val-sat" class="hsl-val">0%</span>
+                </div>
+                <div class="hsl-slider-row">
+                  <span class="hsl-label">Lightness</span>
+                  <input type="range" id="slider-light" min="5" max="100" value="100" class="light-slider" />
+                  <span id="val-light" class="hsl-val">100%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Color Categories -->
+            <div class="palette-category">
+              <span class="category-heading">Street Essentials</span>
+              <div class="swatches-grid" id="grid-essential-colors"></div>
+            </div>
+
+            <div class="palette-category">
+              <span class="category-heading">Cyber & Pop Neons</span>
+              <div class="swatches-grid" id="grid-vibrant-colors"></div>
+            </div>
+
+            <div class="palette-category">
+              <span class="category-heading">Soft Pastels</span>
+              <div class="swatches-grid" id="grid-pastel-colors"></div>
+            </div>
+
+            <div class="palette-category">
+              <span class="category-heading">Warm Earth & Vintage</span>
+              <div class="swatches-grid" id="grid-earthy-colors"></div>
+            </div>
+          </section>
+
+          <!-- 2. TOY STICKERS TAB -->
+          <section id="tab-stickers" class="tab-pane">
+            <div class="drag-hint-banner">
+              <span class="drag-icon">🧸</span>
+              <span><strong>Drag sticker</strong> onto exact spot on T-shirt, or click to place in center!</span>
+            </div>
+
+            <!-- Sticker Filter Tags -->
+            <!-- Sticker Garment Finish Selector -->
+            <div class="sticker-finish-bar">
+              <span class="category-heading">Apparel Print Finish</span>
+              <div class="finish-pills-cluster" id="sticker-finish-pills">
+                <button type="button" class="finish-pill active" data-finish="screenprint"
+                  title="Natural direct-to-garment cotton ink">Natural DTG Print</button>
+                <button type="button" class="finish-pill" data-finish="vinyl"
+                  title="Crisp heat-transfer vinyl streetwear badge">Matte Vinyl</button>
+                <button type="button" class="finish-pill" data-finish="embroidery"
+                  title="Tactile woven embroidered patch">Embroidered Patch</button>
+                <button type="button" class="finish-pill" data-finish="vintage"
+                  title="Sun-washed distressed thrift wash">Vintage Washed</button>
+                <button type="button" class="finish-pill" data-finish="rubber" title="High-density silicone print">HD
+                  Rubber</button>
+                <button type="button" class="finish-pill" data-finish="diecut"
+                  title="Die-cut decal with clean white border">Die-Cut Decal</button>
+              </div>
+            </div>
+
+            <!-- Sticker Filter Tags -->
+            <div class="filter-pills" id="sticker-filter-pills">
+              <button class="pill active" data-category="all">All Graphics</button>
+              <button class="pill" data-category="nature">Natural & Botanical 🌿</button>
+              <button class="pill" data-category="streetwear">Streetwear & Icons 🔥</button>
+              <button class="pill" data-category="street">Street Art</button>
+              <button class="pill" data-category="animals">Animals</button>
+              <button class="pill" data-category="gaming">Gaming</button>
+              <button class="pill" data-category="space">Space</button>
+              <button class="pill" data-category="robots">Robots</button>
+            </div>
+
+            <!-- Stickers Grid -->
+            <div class="stickers-grid" id="toy-stickers-grid"></div>
+          </section>
+
+          <!-- 3. CUSTOM IMAGE TAB -->
+          <section id="tab-images" class="tab-pane">
+            <div class="drag-hint-banner">
+              <span class="drag-icon">📁</span>
+              <span>Drop any image from your computer onto the T-shirt or upload below:</span>
+            </div>
+
+            <!-- File Drop / Upload Box -->
+            <div class="file-drop-zone" id="file-drop-zone">
+              <input type="file" id="file-input" accept="image/png, image/jpeg, image/webp, image/svg+xml"
+                style="display: none;" />
+              <div class="drop-zone-content">
+                <div class="upload-icon-circle">
+                  <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                  </svg>
+                </div>
+                <p class="drop-zone-title"><strong>Click to upload</strong> or drag & drop</p>
+                <p class="drop-zone-sub">PNG, JPG, WebP or SVG up to 10MB</p>
+                <button type="button" class="action-btn secondary upload-btn" id="btn-trigger-upload">Browse
+                  File</button>
+              </div>
+            </div>
+
+            <!-- Uploaded User Images Previews -->
+            <div class="user-uploads-section" id="user-uploads-section" style="display: none;">
+              <span class="category-heading">Your Uploaded Graphics (Draggable)</span>
+              <div class="user-uploads-grid" id="user-uploads-grid"></div>
+            </div>
+
+            <!-- Preset Ready-to-Drop Graphics -->
+            <div class="preset-art-section">
+              <span class="category-heading">Studio Streetwear Badges (Draggable)</span>
+              <div class="presets-grid" id="preset-graphics-grid"></div>
+            </div>
+          </section>
+
+          <!-- 4. TEXT / TYPOGRAPHY TAB -->
+          <!-- 4. TEXT / TYPOGRAPHY TAB -->
+          <section id="tab-text" class="tab-pane">
+            <div class="drag-hint-banner">
+              <span class="drag-icon">✏️</span>
+              <span>Add custom streetwear typography, puff print statements, or brand text:</span>
+            </div>
+
+            <div class="text-tool-form">
+              <div class="form-group">
+                <label for="text-input-field" class="section-label">Your Text</label>
+                <input type="text" id="text-input-field" class="text-input-box" placeholder="e.g. CYBERTOY 99"
+                  value="TORSO STUDIO" />
+              </div>
+
+              <!-- Text Style Presets -->
+              <div class="form-group">
+                <label class="section-label">Print & Texture Style</label>
+                <div class="text-style-presets-grid" id="text-style-presets">
+                  <button type="button" class="style-preset-btn active" data-style="puff"
+                    title="3D Raised Foam Streetwear Puff">
+                    <span class="preset-name">3D Puff Print</span>
+                    <span class="preset-tag">Heavy Foam</span>
+                  </button>
+                  <button type="button" class="style-preset-btn" data-style="screenprint"
+                    title="Natural Soft Cotton Screenprint">
+                    <span class="preset-name">Natural DTG</span>
+                    <span class="preset-tag">Soft Cotton</span>
+                  </button>
+                  <button type="button" class="style-preset-btn" data-style="cracked"
+                    title="90s Vintage Distressed Cracked Ink">
+                    <span class="preset-name">Vintage Cracked</span>
+                    <span class="preset-tag">Distressed</span>
+                  </button>
+                  <button type="button" class="style-preset-btn" data-style="varsity"
+                    title="Collegiate Varsity Athletic Chenille">
+                    <span class="preset-name">Varsity Chenille</span>
+                    <span class="preset-tag">Two-Tone</span>
+                  </button>
+                  <button type="button" class="style-preset-btn" data-style="goldfoil"
+                    title="Luxury Shimmering Metallic Gold Foil">
+                    <span class="preset-name">Gold Foil</span>
+                    <span class="preset-tag">Metallic ✨</span>
+                  </button>
+                  <button type="button" class="style-preset-btn" data-style="embroidery"
+                    title="Tactile Stitched Thread Embroidery">
+                    <span class="preset-name">Embroidered</span>
+                    <span class="preset-tag">Stitched Thread</span>
+                  </button>
+                  <button type="button" class="style-preset-btn" data-style="vintage" title="Sun-Washed Thrift Patina">
+                    <span class="preset-name">Washed Patina</span>
+                    <span class="preset-tag">Sun-Faded</span>
+                  </button>
+                  <button type="button" class="style-preset-btn" data-style="rubber"
+                    title="High-Density Raised Silicone Print">
+                    <span class="preset-name">HD Rubber</span>
+                    <span class="preset-tag">3D Gel</span>
+                  </button>
+                  <button type="button" class="style-preset-btn" data-style="gothic"
+                    title="Dark Streetwear Calligraphy">
+                    <span class="preset-name">Blackletter</span>
+                    <span class="preset-tag">Gothic</span>
+                  </button>
+                  <button type="button" class="style-preset-btn" data-style="brush" title="Natural Flowing Script Ink">
+                    <span class="preset-name">Brush Script</span>
+                    <span class="preset-tag">Signature</span>
+                  </button>
+                  <button type="button" class="style-preset-btn" data-style="neon" title="Luminous Street Neon Glow">
+                    <span class="preset-name">Cyber Neon</span>
+                    <span class="preset-tag">Luminous</span>
+                  </button>
+                  <button type="button" class="style-preset-btn" data-style="clean"
+                    title="Crisp Luxury Minimalist Type">
+                    <span class="preset-name">Clean Modern</span>
+                    <span class="preset-tag">Minimalist</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Typeface Selection -->
+              <div class="form-group">
+                <label for="font-family-select" class="section-label">Typeface Style</label>
+                <select id="font-family-select" class="custom-select">
+                  <option value="'Bebas Neue', sans-serif" selected>Bebas Neue (Heavy Streetwear Display)</option>
+                  <option value="'Space Grotesk', sans-serif">Space Grotesk (Urban Tech Bold)</option>
+                  <option value="'Syne', sans-serif">Syne Extra Bold (Avant-Garde Luxury)</option>
+                  <option value="'Cinzel', serif">Cinzel (Editorial Roman Serif)</option>
+                  <option value="'Playfair Display', serif">Playfair Display (Classic Elegance)</option>
+                  <option value="'Rock Salt', cursive">Rock Salt (Natural Hand Marker)</option>
+                  <option value="'UnifrakturMaguntia', cursive">UnifrakturMaguntia (Authentic Gothic)</option>
+                  <option value="'Alfa Slab One', cursive">Alfa Slab One (Collegiate Varsity)</option>
+                  <option value="'Pirata One', cursive">Pirata One (Heavy Metal Gothic)</option>
+                  <option value="'Pacifico', cursive">Pacifico (Retro 70s Surf Script)</option>
+                  <option value="'Montserrat', sans-serif">Montserrat (Clean Swiss Modern)</option>
+                  <option value="'Orbitron', sans-serif">Orbitron (Y2K Cyberpunk)</option>
+                  <option value="'Outfit', sans-serif">Outfit (Clean Geometric)</option>
+                  <option value="'JetBrains Mono', monospace">JetBrains Mono (Cyber Monospace)</option>
+                  <option value="Impact, sans-serif">Impact (Heavyweight Headline)</option>
+                </select>
+              </div>
+
+              <!-- Font Color Row -->
+              <div class="form-group">
+                <label class="section-label">Font Color</label>
+                <div class="font-color-row">
+                  <input type="color" id="font-color-picker" value="#ffffff" />
+                  <button type="button" class="color-dot active" data-fcolor="#ffffff" style="background: #ffffff;"
+                    title="White"></button>
+                  <button type="button" class="color-dot" data-fcolor="#0f172a" style="background: #0f172a;"
+                    title="Onyx Black"></button>
+                  <button type="button" class="color-dot" data-fcolor="#00f0ff" style="background: #00f0ff;"
+                    title="Neon Cyan"></button>
+                  <button type="button" class="color-dot" data-fcolor="#facc15" style="background: #facc15;"
+                    title="Varsity Gold"></button>
+                  <button type="button" class="color-dot" data-fcolor="#ef4444" style="background: #ef4444;"
+                    title="Crimson"></button>
+                  <button type="button" class="color-dot" data-fcolor="#ec4899" style="background: #ec4899;"
+                    title="Hot Pink"></button>
+                  <button type="button" class="color-dot" data-fcolor="#10b981" style="background: #10b981;"
+                    title="Emerald"></button>
+                </div>
+              </div>
+
+              <!-- Font Size & Spacing Controls -->
+              <div class="form-row-dual">
+                <div class="form-group-half">
+                  <label for="font-size-slider" class="section-label">Size: <span id="font-size-val">34px</span></label>
+                  <input type="range" id="font-size-slider" class="slider-control" min="16" max="72" value="34" />
+                </div>
+                <div class="form-group-half">
+                  <label for="letter-spacing-slider" class="section-label">Tracking: <span
+                      id="letter-spacing-val">2px</span></label>
+                  <input type="range" id="letter-spacing-slider" class="slider-control" min="-2" max="18" value="2" />
+                </div>
+              </div>
+
+              <!-- Curved Banner Toggle -->
+              <div class="form-group curved-toggle-row">
+                <label class="checkbox-label" for="curved-text-checkbox">
+                  <input type="checkbox" id="curved-text-checkbox" />
+                  <span>Arch / Curved Banner Text (Varsity Chest Curve)</span>
+                </label>
+              </div>
+
+              <!-- Stroke / Outline Option -->
+              <div class="form-row-dual">
+                <div class="form-group-half">
+                  <label for="stroke-width-slider" class="section-label">Outline: <span
+                      id="stroke-width-val">0px</span></label>
+                  <input type="range" id="stroke-width-slider" class="slider-control" min="0" max="6" value="0" />
+                </div>
+                <div class="form-group-half">
+                  <label for="stroke-color-picker" class="section-label">Outline Color</label>
+                  <input type="color" id="stroke-color-picker" value="#000000" class="mini-color-input" />
+                </div>
+              </div>
+
+              <button id="btn-add-text" class="action-btn primary full-width">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                <span>Place Text on Shirt</span>
+              </button>
+            </div>
+          </section>
+
+          <!-- 5. LAYERS TAB -->
+          <section id="tab-layers" class="tab-pane">
+            <div class="layers-header">
+              <span class="category-heading">Placed Elements on <span id="layers-current-side-label">FRONT</span></span>
+            </div>
+            <div class="layers-list" id="layers-list">
+              <div class="empty-layers-msg">No custom elements placed on this side yet. Drag stickers or images from the
+                left tabs!</div>
+            </div>
+          </section>
+
+        </div>
+      </aside>
+
+      <!-- RIGHT PANEL: 3D Interactive T-Shirt Studio -->
+      <section class="right-panel">
+
+        <!-- Studio Floating Topbar -->
+        <div class="studio-topbar">
+          <!-- Perspective & 3D Camera Controls -->
+          <div class="view-switch-cluster">
+            <span class="control-label"></span>
+            <div class="segmented-control presets-3d-group" role="group" aria-label="3D T-Shirt View Perspective">
+              <button id="btn-view-front" class="segment-btn active" data-view="front" title="Front View">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2L4 7v10l8 5 8-5V7l-8-5z" />
+                </svg>
+                <span>FRONT</span>
+              </button>
+              <button id="btn-view-back" class="segment-btn" data-view="back" title="Back View">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 22l8-5V7l-8-5-8 5v10l8 5z" />
+                </svg>
+                <span>BACK</span>
+              </button>
+              <button id="btn-view-left" class="segment-btn" data-view="left" title="Left Side View">
+                <span>LEFT</span>
+              </button>
+              <button id="btn-view-right" class="segment-btn" data-view="right" title="Right Side View">
+                <span>RIGHT</span>
+              </button>
+              <button id="btn-view-top" class="segment-btn" data-view="top" title="Top / Collar View">
+                <span>TOP</span>
+              </button>
+            </div>
+
+            <div class="divider-v"></div>
+
+            <!-- 360° Auto-Turntable Mode Button -->
+            <button id="btn-turntable-spin" class="tool-btn turntable-btn" title="Toggle 360° Auto-Turntable Showcase">
+              <span class="turntable-icon">🔄</span>
+              <span>360°</span>
+            </button>
+
+            <!-- XYZ Rotation Fine-Tune Dock Toggle -->
+            <button id="btn-toggle-xyz-dock" class="tool-btn xyz-dock-btn" title="Fine-tune 3D XYZ Rotation Angles">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+                <path d="M2 12h20" />
+              </svg>
+              <span>XYZ Angles</span>
+            </button>
+          </div>
+
+          <!-- Viewport Visual Helpers & Zoom -->
+          <div class="studio-viewport-controls">
+            <!-- Print Zone Toggle -->
+            <button id="btn-toggle-guide" class="icon-toggle-btn active" title="Toggle Print Zone Boundary">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" stroke-dasharray="4 4" />
+              </svg>
+              <span>Guide</span>
+            </button>
+
+
+            <!-- Zoom Controls -->
+            <div class="zoom-cluster">
+              <button id="btn-zoom-out" class="zoom-btn" title="Zoom Out">-</button>
+              <span id="zoom-percentage" class="zoom-label">100%</span>
+              <button id="btn-zoom-in" class="zoom-btn" title="Zoom In">+</button>
+              <button id="btn-zoom-reset" class="zoom-btn reset" title="Reset Camera">⟲</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating 3D XYZ Rotation Controller Dock (Collapsible) -->
+        <div class="xyz-floating-dock" id="xyz-floating-dock" style="display: none;">
+          <div class="xyz-dock-header">
+            <span class="xyz-dock-title">3D XYZ ROTATION CONTROLLER</span>
+            <button id="btn-close-xyz-dock" class="xyz-close-btn" title="Close">✕</button>
+          </div>
+          <div class="xyz-sliders-grid">
+            <div class="xyz-slider-row">
+              <span class="axis-label x-axis">X (Pitch)</span>
+              <input type="range" id="slider-rot-x" min="-90" max="90" value="0" class="axis-slider" />
+              <span id="val-rot-x" class="axis-val">0°</span>
+            </div>
+            <div class="xyz-slider-row">
+              <span class="axis-label y-axis">Y (Yaw)</span>
+              <input type="range" id="slider-rot-y" min="-180" max="180" value="0" class="axis-slider" />
+              <span id="val-rot-y" class="axis-val">0°</span>
+            </div>
+            <div class="xyz-slider-row">
+              <span class="axis-label z-axis">Z (Roll)</span>
+              <input type="range" id="slider-rot-z" min="-180" max="180" value="0" class="axis-slider" />
+              <span id="val-rot-z" class="axis-val">0°</span>
+            </div>
+          </div>
+          <div class="xyz-dock-actions">
+            <button id="btn-zero-xyz" class="action-mini-btn"
+              style="width: auto; padding: 4px 10px; font-size: 11px;">Zero Angles</button>
+            <span class="xyz-drag-hint">Tip: Click & drag anywhere in 3D canvas to rotate freely</span>
+          </div>
+        </div>
+
+        <!-- Studio Interactive Viewport Stage (Injected by editor.ts) -->
+        <div class="studio-main-canvas" id="studio-main-canvas">
+          <!-- Canvas is mounted here -->
+        </div>
+
+
+
+        <!-- Floating Interactive Guide / Toast Banner -->
+        <div class="studio-footer-hud">
+          <div class="hud-status">
+            <span class="hud-indicator"></span>
+            <span id="hud-message">Ready • Drag any element from the left panel onto the shirt</span>
+          </div>
+          <div class="hud-tip">
+            <span>Tip: Click element to scale & rotate • Backspace to delete</span>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Main Module Script -->
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>
